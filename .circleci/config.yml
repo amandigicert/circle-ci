@@ -10,9 +10,9 @@ jobs:
       - run:
           command: |
             echo 'Hello world'
-            set A=Aman
-            echo %A%
-          shell: cmd
+            $env:A='aman'
+            $env:A
+          # shell: cmd
 workflows:
   my-workflow:
     jobs:
