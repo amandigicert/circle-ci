@@ -5,27 +5,14 @@ orbs:
 
 jobs:
   build:
-    executor:
-      name: win/default
+    executor: win/server-2022
     steps:
-      # default shell is Powershell
-      # - run:
-      #    command: $(echo hello | Out-Host; $?) -and $(echo world | Out-Host; $?)
-      #    shell: powershell.exe
-      # - run:
-      #    command: echo hello && echo world
-      #    shell: bash.exe
-      - run: 
-         command: |
-          echo hello & echo world
-          dir
-          set A=aman
-          echo %A%
-         shell: cmd.exe
-
-# Invoke jobs via workflows
-# See: https://circleci.com/docs/2.0/configuration-reference/#workflows
+      - run:
+          command: |
+            echo 'Hello world'
+            set A=Aman
+            echo %A%
 workflows:
-  say-hello-workflow:
+  my-workflow:
     jobs:
       - build
