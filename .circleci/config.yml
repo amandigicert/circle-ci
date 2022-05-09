@@ -12,6 +12,7 @@ jobs:
             echo 'Hello world'
             set A=Aman
             echo %A%
+          shell: cmd
 workflows:
   my-workflow:
     jobs:
