@@ -15,12 +15,13 @@ jobs:
       # - run:
       #    command: echo hello && echo world
       #    shell: bash.exe
-      - run: |
-         echo hello & echo world
-         dir
-         set A=aman
-         echo %A%
-        #  shell: cmd.exe
+      - run: 
+         command: |
+          echo hello & echo world
+          dir
+          set A=aman
+          echo %A%
+         shell: cmd.exe
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
