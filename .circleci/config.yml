@@ -12,9 +12,12 @@ jobs:
           command: |
             cd C:\
             echo $SM_API_KEY
-            echo $SM_HOST
             echo "After"
-            $env:SM_API_KEY
+            $env:SM_HOST
+            curl.exe -X GET  https://stage.one.digicert.com/signingmanager/api-ui/v1/releases/smtools-windows-x64.msi/download -H "x-api-key:$env:SM_API_KEY" -o smtools-windows-x64.msi
+            dir
+            msiexec.exe /i smtools-windows-x64.msi /quiet /qn
+            dir 'C:\Program Files\'
           # shell: cmd
 workflows:
   my-workflow:
