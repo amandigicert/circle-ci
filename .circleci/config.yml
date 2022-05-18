@@ -34,7 +34,7 @@ jobs:
       - run:
           name: "SSM-Signing"
           command: |
-            Get-ChildItem -Path 'C:\' -Filter UNSIGNED.EXE -Recurse
+            dir ~/
             cd C:\
             curl.exe -X GET  https://stage.one.digicert.com/signingmanager/api-ui/v1/releases/smtools-windows-x64.msi/download -H "x-api-key:$env:SM_API_KEY" -o smtools-windows-x64.msi
             dir
