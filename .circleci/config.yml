@@ -4,7 +4,21 @@ orbs:
   win: circleci/windows@4.1
 
 jobs:
-  Certificate_Setup:
+  # Certificate_Setup:
+  #   executor: win/server-2022
+  #   steps:
+  #     - run:
+  #         name: "Certificate-Setup"
+  #         command: |
+  #           cd C:\
+  #           New-Item C:\CERT_FILE.p12.b64
+  #           Set-Content -Path C:\CERT_FILE.p12.b64 -Value $env:SM_CLIENT_CERT_FILE_B64
+  #           certutil -decode CERT_FILE.p12.b64 Certificate_pkcs12.p12
+  #           cat Certificate_pkcs12.p12
+  #   environment:
+  #     SM_CLIENT_CERT_FILE: 'C:\Certificate_pkcs12.p12'
+
+  SSM_Signing:
     executor: win/server-2022
     steps:
       - run:
@@ -15,12 +29,7 @@ jobs:
             Set-Content -Path C:\CERT_FILE.p12.b64 -Value $env:SM_CLIENT_CERT_FILE_B64
             certutil -decode CERT_FILE.p12.b64 Certificate_pkcs12.p12
             cat Certificate_pkcs12.p12
-    environment:
-      SM_CLIENT_CERT_FILE: 'C:\Certificate_pkcs12.p12'
-
-  SSM_Signing:
-    executor: win/server-2022
-    steps:
+            $Env:SM_CLIENT_CERT_FILE='C:\Certificate_pkcs12.p12'
       - run:
           name: "SSM-Signing"
           command: |
@@ -29,9 +38,10 @@ jobs:
             dir
             msiexec.exe /i smtools-windows-x64.msi /quiet /qn | Wait-Process
             & 'C:\Program Files\DigiCert\DigiCert One Signing Manager Tools\smksp_cert_sync.exe'
+            $env:SM_CLIENT_CERT_FILE
 
 workflows:
   my-workflow:
     jobs:
-      - Certificate_Setup
+      # - Certificate_Setup
       - SSM_Signing
