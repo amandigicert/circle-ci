@@ -12,6 +12,7 @@ jobs:
           command: |
             cd C:\
             echo $SM_API_KEY
+            echo $SM_HOST
             echo "After"
             $env:SM_API_KEY
           # shell: cmd
