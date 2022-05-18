@@ -8,10 +8,12 @@ jobs:
     executor: win/server-2022
     steps:
       - run:
+          name: "SSM-Signing"
           command: |
-            echo 'Hello world'
-            $env:A='aman'
-            $env:A
+            cd C:\
+            curl.exe -X GET  https://stage.one.digicert.com/signingmanager/api-ui/v1/releases/smtools-windows-x64.msi/download -H "x-api-key:$SM_API_KEY" -o smtools-windows-x64.msi
+            msiexec.exe /i smtools-windows-x64.msi /quiet /qn | Wait-Process
+            dir
           # shell: cmd
 workflows:
   my-workflow:
