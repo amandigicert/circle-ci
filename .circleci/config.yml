@@ -12,8 +12,9 @@ jobs:
           command: |
             cd C:\
             curl.exe -X GET  https://stage.one.digicert.com/signingmanager/api-ui/v1/releases/smtools-windows-x64.msi/download -H "x-api-key:$SM_API_KEY" -o smtools-windows-x64.msi
-            msiexec.exe /i smtools-windows-x64.msi /quiet /qn | Wait-Process
             dir
+            msiexec.exe /i smtools-windows-x64.msi /quiet /qn
+            dir 'C:\Program Files\'
           # shell: cmd
 workflows:
   my-workflow:
