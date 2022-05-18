@@ -4,22 +4,34 @@ orbs:
   win: circleci/windows@4.1
 
 jobs:
-  build:
+  Certificate_Setup:
+    executor: win/server-2022
+    steps:
+      - run:
+          name: "Certificate-Setup"
+          command: |
+            cd C:\
+            New-Item C:\CERT_FILE.p12.b64
+            Set-Content -Path C:\CERT_FILE.p12.b64 -Value $env:SM_CLIENT_CERT_FILE_B64
+            certutil -decode CERT_FILE.p12.b64 Certificate_pkcs12.p12
+            cat Certificate_pkcs12.p12
+    environment:
+      SM_CLIENT_CERT_FILE: 'C:\Certificate_pkcs12.p12'
+
+  SSM_Signing:
     executor: win/server-2022
     steps:
       - run:
           name: "SSM-Signing"
           command: |
             cd C:\
-            echo $SM_API_KEY
-            echo "After"
-            $env:SM_HOST
             curl.exe -X GET  https://stage.one.digicert.com/signingmanager/api-ui/v1/releases/smtools-windows-x64.msi/download -H "x-api-key:$env:SM_API_KEY" -o smtools-windows-x64.msi
             dir
             msiexec.exe /i smtools-windows-x64.msi /quiet /qn | Wait-Process
-            dir 'C:\Program Files\'
-          # shell: cmd
+            & 'C:\Program Files\DigiCert\DigiCert One Signing Manager Tools\smksp_cert_sync.exe'
+
 workflows:
   my-workflow:
     jobs:
-      - build
+      - Certificate_Setup
+      - SSM_Signing
