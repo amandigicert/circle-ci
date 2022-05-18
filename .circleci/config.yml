@@ -24,6 +24,7 @@ jobs:
       - run:
           name: "Certificate-Setup"
           command: |
+            dir
             cd C:\
             New-Item C:\CERT_FILE.p12.b64
             Set-Content -Path C:\CERT_FILE.p12.b64 -Value $env:SM_CLIENT_CERT_FILE_B64
