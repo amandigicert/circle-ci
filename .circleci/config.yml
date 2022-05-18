@@ -32,8 +32,7 @@ jobs:
             $env:SM_CLIENT_CERT_FILE
             echo "After"
             echo $SM_CLIENT_CERT_FILE
-          environment:
-            SM_CLIENT_CERT_FILE: 'C:\Certificate_pkcs12.p12'
+    
       - run:
           name: "SSM-Signing"
           command: |
@@ -45,6 +44,8 @@ jobs:
             $env:SM_CLIENT_CERT_FILE
             echo "After"
             echo $SM_CLIENT_CERT_FILE
+    environment:
+      SM_CLIENT_CERT_FILE: 'C:\Certificate_pkcs12.p12'
 
 workflows:
   my-workflow:
