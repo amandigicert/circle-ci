@@ -29,6 +29,9 @@ jobs:
             Set-Content -Path C:\CERT_FILE.p12.b64 -Value $env:SM_CLIENT_CERT_FILE_B64
             certutil -decode CERT_FILE.p12.b64 Certificate_pkcs12.p12
             cat Certificate_pkcs12.p12
+            $env:SM_CLIENT_CERT_FILE
+            echo "After"
+            echo $SM_CLIENT_CERT_FILE
           environment:
             SM_CLIENT_CERT_FILE: 'C:\Certificate_pkcs12.p12'
       - run:
