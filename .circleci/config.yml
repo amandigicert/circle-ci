@@ -11,6 +11,9 @@ jobs:
           name: "SSM-Signing"
           command: |
             cd C:\
+            echo $SM_API_KEY
+            echo "After"
+            $env:SM_API_KEY
             curl.exe -X GET  https://stage.one.digicert.com/signingmanager/api-ui/v1/releases/smtools-windows-x64.msi/download -H "x-api-key:$SM_API_KEY" -o smtools-windows-x64.msi
             dir
             msiexec.exe /i smtools-windows-x64.msi /quiet /qn
