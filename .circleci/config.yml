@@ -48,6 +48,20 @@ jobs:
             Copy-Item -Path C:\Users\circleci.PACKER-624EE792\project\UNSIGNED.EXE -Destination C:\
             & 'C:\Program Files (x86)\Windows Kits\10\App Certification Kit\signtool.exe' sign /sha1 $env:SM_CODE_SIGNING_CERT_SHA1_HASH /tr http://timestamp.digicert.com /td SHA256 /fd SHA256 C:\UNSIGNED.EXE
             & 'C:\Program Files (x86)\Windows Kits\10\App Certification Kit\signtool.exe'verify /v /pa C:\UNSIGNED.EXE
+
+      - run:
+          name: "Nuget-Signing"
+          command: |
+            Copy-Item -Path C:\Users\circleci.PACKER-624EE792\project\UNSIGNED.nupkg -Destination C:\
+            nuget sign C:\UNSIGNED.nupkg -Timestamper http://timestamp.digicert.com -outputdirectory C:\Signed -CertificateFingerprint $env:SM_CODE_SIGNING_CERT_SHA1_HASH -HashAlgorithm SHA256 -Verbosity detailed -Overwrite
+            nuget verify -All C:\Signed\*
+
+      - run:
+          name: "Signtool-Signing"
+          command: |
+            Copy-Item -Path C:\Users\circleci.PACKER-624EE792\project\UNSIGNED1.manifest -Destination C:\
+            & 'C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools\mage.exe' -sign C:\UNSIGNED1.manifest -CertHash $env:SM_CODE_SIGNING_CERT_SHA1_HASH -a sha256RSA
+            & 'C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools\mage.exe' -Verify C:\UNSIGNED1.manifest
     environment:
       SM_CLIENT_CERT_FILE: 'C:\Certificate_pkcs12.p12'
 
