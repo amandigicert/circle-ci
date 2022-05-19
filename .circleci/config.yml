@@ -21,6 +21,7 @@ jobs:
   SSM_Signing:
     executor: win/server-2022
     steps:
+      - checkout
       - run:
           name: "Certificate-Setup"
           command: |
@@ -35,7 +36,7 @@ jobs:
           name: "SSM-Signing"
           command: |
             echo $CIRCLE_WORKING_DIRECTORY
-            dir ~/circle-ci/
+            dir ~/project/
             cd C:\
             curl.exe -X GET  https://stage.one.digicert.com/signingmanager/api-ui/v1/releases/smtools-windows-x64.msi/download -H "x-api-key:$env:SM_API_KEY" -o smtools-windows-x64.msi
             dir
