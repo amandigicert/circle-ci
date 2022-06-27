@@ -28,9 +28,9 @@ jobs:
       - run:
           name: "Signtool-Signing"
           command: |
-            dir C:\Users\
-            Copy-Item -Path C:\Users\circleci.PACKER-624EE792\project\UNSIGNED.jar -Destination C:\
-            jarsigner -keystore NONE -storepass NONE -storetype PKCS11 -sigalg SHA256withRSA -providerClass sun.security.pkcs11.SunPKCS11 -providerArg C:\Users\circleci.PACKER-624EE792\project\pkcs11properties.cfg -signedjar C:\SIGNED.jar C:\UNSIGNED.jar $env:Keypair -tsa http://timestamp.digicert.com
+            dir C:\Users\circleci.PACKER-625580E2
+            Copy-Item -Path C:\Users\circleci.PACKER-625580E2\project\UNSIGNED.jar -Destination C:\
+            jarsigner -keystore NONE -storepass NONE -storetype PKCS11 -sigalg SHA256withRSA -providerClass sun.security.pkcs11.SunPKCS11 -providerArg C:\Users\circleci.PACKER-625580E2\project\pkcs11properties.cfg -signedjar C:\SIGNED.jar C:\UNSIGNED.jar $env:Keypair -tsa http://timestamp.digicert.com
             jarsigner -verify C:\SIGNED.jar
 
       # - run:
@@ -38,7 +38,7 @@ jobs:
       #     command: |
       #             & $env:Smctl keypair generate rsa $env:Keypair --cert-alias=$env:Keypair --cert-profile-id=93a61900-e33f-4d24-a91e-f1e405db4452 --generate-cert=true --key-type=PRODUCTION
       #       Get-ChildItem -Path 'C:\Program Files (x86)\Windows Kits\10\App Certification Kit' -Filter signtool.exe -Recurse
-      #       Copy-Item -Path C:\Users\circleci.PACKER-624EE792\project\UNSIGNED.nupkg -Destination C:\
+      #       Copy-Item -Path C:\Users\circleci.PACKER-625580E2\project\UNSIGNED.nupkg -Destination C:\
       #       nuget sign C:\UNSIGNED.nupkg -Timestamper http://timestamp.digicert.com -outputdirectory C:\Signed -CertificateFingerprint $env:SM_CODE_SIGNING_CERT_SHA1_HASH -HashAlgorithm SHA256 -Verbosity detailed -Overwrite
       #       nuget verify -All C:\Signed\*
 
