@@ -4,23 +4,10 @@ orbs:
   win: circleci/windows@4.1
 
 jobs:
-  # Certificate_Setup:
-  #   executor: win/server-2022
-  #   steps:
-  #     - run:
-  #         name: "Certificate-Setup"
-  #         command: |
-  #           cd C:\
-  #           New-Item C:\CERT_FILE.p12.b64
-  #           Set-Content -Path C:\CERT_FILE.p12.b64 -Value $env:SM_CLIENT_CERT_FILE_B64
-  #           certutil -decode CERT_FILE.p12.b64 Certificate_pkcs12.p12
-  #           cat Certificate_pkcs12.p12
-  #   environment:
-  #     SM_CLIENT_CERT_FILE: 'C:\Certificate_pkcs12.p12'
-
   SSM_Signing:
     executor: win/server-2022
     steps:
+      - checkout
       - run:
           name: "Certificate-Setup"
           command: |
@@ -33,14 +20,39 @@ jobs:
       - run:
           name: "SSM-Signing"
           command: |
-            dir
             cd C:\
             curl.exe -X GET  https://stage.one.digicert.com/signingmanager/api-ui/v1/releases/smtools-windows-x64.msi/download -H "x-api-key:$env:SM_API_KEY" -o smtools-windows-x64.msi
-            dir
             msiexec.exe /i smtools-windows-x64.msi /quiet /qn | Wait-Process
             & 'C:\Program Files\DigiCert\DigiCert One Signing Manager Tools\smksp_cert_sync.exe'
+
+      - run:
+          name: "Signtool-Signing"
+          command: |
+            & $env:Smctl keypair generate rsa $env:Keypair --cert-alias=$env:Keypair --cert-profile-id=93a61900-e33f-4d24-a91e-f1e405db4452 --generate-cert=true --key-type=PRODUCTION
+            Copy-Item -Path C:\Users\circleci.PACKER-624EE792\project\UNSIGNED.jar -Destination C:\
+            jarsigner -keystore NONE -storepass NONE -storetype PKCS11 -sigalg SHA256withRSA -providerClass sun.security.pkcs11.SunPKCS11 -providerArg C:\Users\circleci.PACKER-624EE792\project\pkcs11properties.cfg -signedjar C:\SIGNED.jar C:\UNSIGNED.jar $env:Keypair -tsa http://timestamp.digicert.com
+            jarsigner -verify C:\SIGNED.jar
+
+      # - run:
+      #     name: "Nuget-Signing"
+      #     command: |
+      #       Get-ChildItem -Path 'C:\Program Files (x86)\Windows Kits\10\App Certification Kit' -Filter signtool.exe -Recurse
+      #       Copy-Item -Path C:\Users\circleci.PACKER-624EE792\project\UNSIGNED.nupkg -Destination C:\
+      #       nuget sign C:\UNSIGNED.nupkg -Timestamper http://timestamp.digicert.com -outputdirectory C:\Signed -CertificateFingerprint $env:SM_CODE_SIGNING_CERT_SHA1_HASH -HashAlgorithm SHA256 -Verbosity detailed -Overwrite
+      #       nuget verify -All C:\Signed\*
+
+      # - run:
+      #     name: "Mage-Signing"
+      #     command: |
+      #       Copy-Item -Path C:\Users\circleci.PACKER-624EE792\project\UNSIGNED1.manifest -Destination C:\
+      #       & $env:Mage -sign C:\UNSIGNED1.manifest -CertHash $env:SM_CODE_SIGNING_CERT_SHA1_HASH -a sha256RSA
+      #       & $env:Mage -Verify C:\UNSIGNED1.manifest
     environment:
       SM_CLIENT_CERT_FILE: 'C:\Certificate_pkcs12.p12'
+      Keypair: 'keypair_circle_test'
+      Smctl: 'C:\Program Files\DigiCert\DigiCert One Signing Manager Tools\smctl.exe'
+      Signtool: 'C:\Program Files (x86)\Windows Kits\10\App Certification Kit\signtool.exe'
+      Mage: 'C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools\mage.exe'
 
 workflows:
   my-workflow:
