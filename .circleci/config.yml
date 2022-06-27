@@ -24,10 +24,10 @@ jobs:
             curl.exe -X GET  https://stage.one.digicert.com/signingmanager/api-ui/v1/releases/smtools-windows-x64.msi/download -H "x-api-key:$env:SM_API_KEY" -o smtools-windows-x64.msi
             msiexec.exe /i smtools-windows-x64.msi /quiet /qn | Wait-Process
 
-      - run:
-          name: "Generate Production Keypair"
-          command: |
-            & $env:Smctl keypair generate rsa $env:Keypair --cert-alias=$env:Keypair --cert-profile-id=93a61900-e33f-4d24-a91e-f1e405db4452 --generate-cert=true --key-type=PRODUCTION
+      # - run:
+      #     name: "Generate Production Keypair"
+      #     command: |
+      #       & $env:Smctl keypair generate rsa $env:Keypair --cert-alias=$env:Keypair --cert-profile-id=93a61900-e33f-4d24-a91e-f1e405db4452 --generate-cert=true --key-type=PRODUCTION
 
       - run:
           name: "Signing using Jarsigner"
@@ -38,7 +38,7 @@ jobs:
       - run:
           name: "Jarsigner verify"
           command: |
-            jarsigner -verify D:\a\github-action-electron\github-action-electron\dist\SIGNED.jar
+            jarsigner -verify C:\SIGNED.jar
  
       # - run:
       #     name: "Nuget-Signing"
