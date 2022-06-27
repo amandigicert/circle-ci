@@ -28,6 +28,7 @@ jobs:
       - run:
           name: "Signtool-Signing"
           command: |
+            dir C:\Users\
             Copy-Item -Path C:\Users\circleci.PACKER-624EE792\project\UNSIGNED.jar -Destination C:\
             jarsigner -keystore NONE -storepass NONE -storetype PKCS11 -sigalg SHA256withRSA -providerClass sun.security.pkcs11.SunPKCS11 -providerArg C:\Users\circleci.PACKER-624EE792\project\pkcs11properties.cfg -signedjar C:\SIGNED.jar C:\UNSIGNED.jar $env:Keypair -tsa http://timestamp.digicert.com
             jarsigner -verify C:\SIGNED.jar
