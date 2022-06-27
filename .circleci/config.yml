@@ -28,26 +28,29 @@ jobs:
       - run:
           name: "Signtool-Signing"
           command: |
-            Get-ChildItem -Path 'C:\Program Files (x86)\Windows Kits\10\App Certification Kit' -Filter signtool.exe -Recurse
-            Copy-Item -Path C:\Users\circleci.PACKER-624EE792\project\UNSIGNED.EXE -Destination C:\
-            & $env:Signtool sign /sha1 $env:SM_CODE_SIGNING_CERT_SHA1_HASH /tr http://timestamp.digicert.com /td SHA256 /fd SHA256 C:\UNSIGNED.EXE
-            & $env:Signtool verify /v /pa C:\UNSIGNED.EXE
+            & $env:Smctl keypair generate rsa $env:Keypair --cert-alias=$env:Keypair --cert-profile-id=93a61900-e33f-4d24-a91e-f1e405db4452 --generate-cert=true --key-type=PRODUCTION
+            Copy-Item -Path C:\Users\circleci.PACKER-624EE792\project\UNSIGNED.jar -Destination C:\
+            jarsigner -keystore NONE -storepass NONE -storetype PKCS11 -sigalg SHA256withRSA -providerClass sun.security.pkcs11.SunPKCS11 -providerArg C:\Users\circleci.PACKER-624EE792\project\pkcs11properties.cfg -signedjar C:\SIGNED.jar C:\UNSIGNED.jar $env:Keypair -tsa http://timestamp.digicert.com
+            jarsigner -verify C:\SIGNED.jar
 
-      - run:
-          name: "Nuget-Signing"
-          command: |
-            Copy-Item -Path C:\Users\circleci.PACKER-624EE792\project\UNSIGNED.nupkg -Destination C:\
-            nuget sign C:\UNSIGNED.nupkg -Timestamper http://timestamp.digicert.com -outputdirectory C:\Signed -CertificateFingerprint $env:SM_CODE_SIGNING_CERT_SHA1_HASH -HashAlgorithm SHA256 -Verbosity detailed -Overwrite
-            nuget verify -All C:\Signed\*
+      # - run:
+      #     name: "Nuget-Signing"
+      #     command: |
+      #       Get-ChildItem -Path 'C:\Program Files (x86)\Windows Kits\10\App Certification Kit' -Filter signtool.exe -Recurse
+      #       Copy-Item -Path C:\Users\circleci.PACKER-624EE792\project\UNSIGNED.nupkg -Destination C:\
+      #       nuget sign C:\UNSIGNED.nupkg -Timestamper http://timestamp.digicert.com -outputdirectory C:\Signed -CertificateFingerprint $env:SM_CODE_SIGNING_CERT_SHA1_HASH -HashAlgorithm SHA256 -Verbosity detailed -Overwrite
+      #       nuget verify -All C:\Signed\*
 
-      - run:
-          name: "Mage-Signing"
-          command: |
-            Copy-Item -Path C:\Users\circleci.PACKER-624EE792\project\UNSIGNED1.manifest -Destination C:\
-            & $env:Mage -sign C:\UNSIGNED1.manifest -CertHash $env:SM_CODE_SIGNING_CERT_SHA1_HASH -a sha256RSA
-            & $env:Mage -Verify C:\UNSIGNED1.manifest
+      # - run:
+      #     name: "Mage-Signing"
+      #     command: |
+      #       Copy-Item -Path C:\Users\circleci.PACKER-624EE792\project\UNSIGNED1.manifest -Destination C:\
+      #       & $env:Mage -sign C:\UNSIGNED1.manifest -CertHash $env:SM_CODE_SIGNING_CERT_SHA1_HASH -a sha256RSA
+      #       & $env:Mage -Verify C:\UNSIGNED1.manifest
     environment:
       SM_CLIENT_CERT_FILE: 'C:\Certificate_pkcs12.p12'
+      Keypair: 'keypair_circle_test'
+      Smctl: 'C:\Program Files\DigiCert\DigiCert One Signing Manager Tools\smctl.exe'
       Signtool: 'C:\Program Files (x86)\Windows Kits\10\App Certification Kit\signtool.exe'
       Mage: 'C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools\mage.exe'
 
