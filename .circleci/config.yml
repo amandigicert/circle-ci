@@ -23,16 +23,22 @@ jobs:
             cd C:\
             curl.exe -X GET  https://stage.one.digicert.com/signingmanager/api-ui/v1/releases/smtools-windows-x64.msi/download -H "x-api-key:$env:SM_API_KEY" -o smtools-windows-x64.msi
             msiexec.exe /i smtools-windows-x64.msi /quiet /qn | Wait-Process
-            & 'C:\Program Files\DigiCert\DigiCert One Signing Manager Tools\smksp_cert_sync.exe'
 
       - run:
-          name: "Signtool-Signing"
+          name: "Generate Production Keypair"
           command: |
-            dir C:\Users\circleci.PACKER-625580E2\project\
+            & $env:Smctl keypair generate rsa $env:Keypair --cert-alias=$env:Keypair --cert-profile-id=93a61900-e33f-4d24-a91e-f1e405db4452 --generate-cert=true --key-type=PRODUCTION
+
+      - run:
+          name: "Signing using Jarsigner"
+          command: |
             Copy-Item -Path C:\Users\circleci.PACKER-625580E2\project\UNSIGNED.jar -Destination C:\
             jarsigner -keystore NONE -storepass NONE -storetype PKCS11 -sigalg SHA256withRSA -providerClass sun.security.pkcs11.SunPKCS11 -providerArg C:\Users\circleci.PACKER-625580E2\project\pkcs11properties.cfg -signedjar C:\SIGNED.jar C:\UNSIGNED.jar $env:Keypair -tsa http://timestamp.digicert.com
-            jarsigner -verify C:\SIGNED.jar
-            
+
+      - run:
+          name: "Jarsigner verify"
+          command: |
+            jarsigner -verify D:\a\github-action-electron\github-action-electron\dist\SIGNED.jar
  
       # - run:
       #     name: "Nuget-Signing"
@@ -51,7 +57,7 @@ jobs:
       #       & $env:Mage -Verify C:\UNSIGNED1.manifest
     environment:
       SM_CLIENT_CERT_FILE: 'C:\Certificate_pkcs12.p12'
-      Keypair: 'keypair_circle_test'
+      Keypair: 'keypair_circle_test_1'
       Smctl: 'C:\Program Files\DigiCert\DigiCert One Signing Manager Tools\smctl.exe'
       Signtool: 'C:\Program Files (x86)\Windows Kits\10\App Certification Kit\signtool.exe'
       Mage: 'C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools\mage.exe'
